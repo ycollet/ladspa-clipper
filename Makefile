@@ -18,10 +18,10 @@ clean:
 	rm -f *.o *.so
 
 install: all
-	install -m 644 $(PLUG).so $(DEST)$(INSTALL_PATH)
+	install -m 644 $(PLUG).so $(DESTDIR)$(INSTALL_PATH)
 
 uninstall:
-	rm $(DEST)/$(PLUG).so
+	rm $(DESTDIR)/$(PLUG).so
 
 tarball:
 	@ln -s . $(PLUG)
