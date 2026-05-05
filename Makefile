@@ -1,5 +1,5 @@
 PLUG = clipper
-DEST ?= /usr/local/lib/ladspa
+INSTALL_PATH ?= /usr/lib64/ladspa/
 
 all: $(PLUG).so
 
@@ -18,7 +18,7 @@ clean:
 	rm -f *.o *.so
 
 install: all
-	install -m 644 $(PLUG).so $(DEST)
+	install -m 644 $(PLUG).so $(DEST)$(INSTALL_PATH)
 
 uninstall:
 	rm $(DEST)/$(PLUG).so
