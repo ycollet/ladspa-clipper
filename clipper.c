@@ -1,8 +1,8 @@
 /*
 	clipper.c
-	
+
 	Copyright (C) 2002 Tim Goetze <tim@quitte.de>
-	
+
 	http://quitte.de/dsp/
 
 	hard clipping, without any aliasing protection. Amplify the
@@ -28,16 +28,15 @@
 #include <malloc.h>
 #include <ladspa.h>
 
-typedef struct 
-{
-	LADSPA_Data * in;
-	LADSPA_Data * out;
+typedef struct {
+    LADSPA_Data * in;
+    LADSPA_Data * out;
 
-	LADSPA_Data gain;
+    LADSPA_Data gain;
 
-	LADSPA_Data clip;
-	LADSPA_Data state, last;
-} 
+    LADSPA_Data clip;
+    LADSPA_Data state, last;
+}
 clipper;
 
 #define PROCESS(assignment) \
@@ -70,123 +69,111 @@ clipper;
 	} \
 	\
 	((clipper *) h)->last = last; \
-	((clipper *) h)->state = state; 
+	((clipper *) h)->state = state;
 
 /* /////////////////////////////////////////////////////////////////////// */
 
 static LADSPA_Handle
-instantiate (const struct _LADSPA_Descriptor * desc, unsigned long sr)
-{
-	clipper * h = (clipper *) malloc (sizeof (clipper));
-	h->gain = 1.f;
-	h->clip = .5f;
-	return h;
+instantiate (const struct _LADSPA_Descriptor * desc, unsigned long sr) {
+    clipper * h = (clipper *) malloc (sizeof (clipper));
+    h->gain = 1.f;
+    h->clip = .5f;
+    return h;
 }
 
 static void
-connect_port (LADSPA_Handle h, unsigned long n, LADSPA_Data * to)
-{
-	if (n == 0)
-		((clipper *) h)->in = to;
-	else if (n == 1)
-		((clipper *) h)->out = to;
+connect_port (LADSPA_Handle h, unsigned long n, LADSPA_Data * to) {
+    if (n == 0)
+        ((clipper *) h)->in = to;
+    else if (n == 1)
+        ((clipper *) h)->out = to;
 }
 
 static void
-activate (LADSPA_Handle h)
-{
-	((clipper *) h)->last =
-	((clipper *) h)->state = 0.f;
+activate (LADSPA_Handle h) {
+    ((clipper *) h)->last =
+        ((clipper *) h)->state = 0.f;
 }
 
 static void
-run (LADSPA_Handle h, unsigned long frames)
-{
-	PROCESS (out[i] = state);
+run (LADSPA_Handle h, unsigned long frames) {
+    PROCESS (out[i] = state);
 }
 
 static void
-run_adding (LADSPA_Handle h, unsigned long frames)
-{
-	PROCESS (out[i] += gain * state);
+run_adding (LADSPA_Handle h, unsigned long frames) {
+    PROCESS (out[i] += gain * state);
 }
 
 static void
-set_run_adding_gain (LADSPA_Handle h, LADSPA_Data gain)
-{
-	((clipper *) h)->gain = gain;
+set_run_adding_gain (LADSPA_Handle h, LADSPA_Data gain) {
+    ((clipper *) h)->gain = gain;
 }
 
 static void
-cleanup (LADSPA_Handle h)
-{
-	free (h);
+cleanup (LADSPA_Handle h) {
+    free (h);
 }
 
 /* /////////////////////////////////////////////////////////////////////// */
 
-static const LADSPA_PortDescriptor 
-port_descriptors[] = 
-{
-	LADSPA_PORT_INPUT | LADSPA_PORT_AUDIO,
-	LADSPA_PORT_OUTPUT | LADSPA_PORT_AUDIO,
+static const LADSPA_PortDescriptor
+port_descriptors[] = {
+    LADSPA_PORT_INPUT | LADSPA_PORT_AUDIO,
+    LADSPA_PORT_OUTPUT | LADSPA_PORT_AUDIO,
 };
 
 static const char *
-port_names[] =
-{
-	"in",
-	"out",
+port_names[] = {
+    "in",
+    "out",
 };
 
 static const LADSPA_PortRangeHint
-port_range_hints[] =
-{
-	/* gaan we mieren neuken? ja wel! */
-	{
-		LADSPA_HINT_BOUNDED_BELOW | 
-		LADSPA_HINT_BOUNDED_ABOVE | 
-		LADSPA_HINT_DEFAULT_MIDDLE,
-		-1.0, 1.0
-	},
-	{
-		LADSPA_HINT_BOUNDED_BELOW | 
-		LADSPA_HINT_BOUNDED_ABOVE | 
-		LADSPA_HINT_DEFAULT_MIDDLE,
-		-1.0, 1.0
-	},
+port_range_hints[] = {
+    /* gaan we mieren neuken? ja wel! */
+    {
+        LADSPA_HINT_BOUNDED_BELOW |
+        LADSPA_HINT_BOUNDED_ABOVE |
+        LADSPA_HINT_DEFAULT_MIDDLE,
+        -1.0, 1.0
+    },
+    {
+        LADSPA_HINT_BOUNDED_BELOW |
+        LADSPA_HINT_BOUNDED_ABOVE |
+        LADSPA_HINT_DEFAULT_MIDDLE,
+        -1.0, 1.0
+    },
 };
 
 static const LADSPA_Descriptor
-descriptor =
-{
-	UniqueID:	1762,
-	Label: "clipper",
-	Properties: LADSPA_PROPERTY_HARD_RT_CAPABLE,
-	Name: "hard clipper (no antialiasing)",
-	Maker: "Tim Goetze <tim@quitte.de>",
-	Copyright: "GPL, (C) 2002 <tim@quitte.de>",
-	
-	PortCount: 2,
-	PortDescriptors: port_descriptors,
-	PortNames: port_names,
-	PortRangeHints: port_range_hints,
-	
-	/* methods */
-	instantiate: instantiate,
-	connect_port: connect_port,
-	activate: activate,
-	run: run,
-	run_adding: run_adding,
-	set_run_adding_gain: set_run_adding_gain,
-	cleanup: cleanup,
+descriptor = {
+    UniqueID:	1762,
+Label: "clipper",
+Properties: LADSPA_PROPERTY_HARD_RT_CAPABLE,
+Name: "hard clipper (no antialiasing)",
+Maker: "Tim Goetze <tim@quitte.de>",
+Copyright: "GPL, (C) 2002 <tim@quitte.de>",
+
+    PortCount: 2,
+PortDescriptors: port_descriptors,
+PortNames: port_names,
+PortRangeHints: port_range_hints,
+
+    /* methods */
+instantiate: instantiate,
+connect_port: connect_port,
+activate: activate,
+run: run,
+run_adding: run_adding,
+set_run_adding_gain: set_run_adding_gain,
+cleanup: cleanup,
 };
 
 /* /////////////////////////////////////////////////////////////////////// */
 
 const LADSPA_Descriptor *
-ladspa_descriptor (unsigned long index) 
-{
-	return index ? 0 : &descriptor;
+ladspa_descriptor (unsigned long index) {
+    return index ? 0 : &descriptor;
 }
 
